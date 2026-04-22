@@ -1,5 +1,4 @@
 #include "VirtualNode.hpp"
-
 #include <geode.devtools/include/API.hpp>
 #include <Geode/utils/coro.hpp>
 #include <Geode/utils/file.hpp>

@@ -59,22 +59,27 @@ VirtualDOMManager::VirtualDOMManager() {
 						co_return;
 					
 					auto dat = data.unwrap();
-					if (isRoot && dat["type"].asString().unwrapOr("") == "Root") {
-						self->importJSON(dat);
-					} else {
-						self->CCNode::addChild(manager->createFromJSON(dat));
-					}
+
+					Loader::get()->queueInMainThread([=] {
+						if (isRoot && dat["type"].asString().unwrapOr("") == "Root") {
+							self->importJSON(dat);
+						} else {
+							self->CCNode::addChild(manager->createFromJSON(dat));
+						}
+					});
 				});
 			}
 
 			devtools::sameLine();
 
 			if (devtools::button((char const*)u8"\ue967" " Export")) {
-				arc::spawn([manager, self, options](this auto sel) -> arc::Future<void> {
+				auto json = self->exportJSON();
+
+				arc::spawn([manager, self, options, json](this auto sel) -> arc::Future<void> {
 					auto file = co_await file::pick(file::PickMode::SaveFile, options);
 
 					if (file.isOk() && *file) {
-						if (file::writeToJson(**file, self->exportJSON()).isErr()) {
+						if (file::writeToJson(**file, json).isErr()) {
 							log::warn("Failed to export to {}", file.unwrap());
 						}
 					}

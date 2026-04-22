@@ -49,7 +49,7 @@ VirtualDOMManager::VirtualDOMManager() {
 			}}};
 
 			if (devtools::button((char const*)u8"\ue92a" " Import")) {
-				$async(=) {
+				arc::spawn([=](this auto sel) -> arc::Future<void> {
 					auto json = co_await file::pick(file::PickMode::OpenFile, options);
 
 					if (!json.isOk() || !*json)
@@ -64,13 +64,13 @@ VirtualDOMManager::VirtualDOMManager() {
 					} else {
 						self->CCNode::addChild(manager->createFromJSON(dat));
 					}
-				};
+				});
 			}
 
 			devtools::sameLine();
 
 			if (devtools::button((char const*)u8"\ue967" " Export")) {
-				$async(manager, self, options) {
+				arc::spawn([manager, self, options](this auto sel) -> arc::Future<void> {
 					auto file = co_await file::pick(file::PickMode::SaveFile, options);
 
 					if (file.isOk() && *file) {
@@ -78,7 +78,7 @@ VirtualDOMManager::VirtualDOMManager() {
 							log::warn("Failed to export to {}", file.unwrap());
 						}
 					}
-				};
+				});
 			}
 
 			if (!isRoot && devtools::button((char const*)u8"\ue91e" " Clone")) {

@@ -29,6 +29,4 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 setup_geode_mod(${PROJECT_NAME})
-target_compile_options(${PROJECT_NAME} PRIVATE -g)
-
 target_link_libraries(${PROJECT_NAME} UIBuilder)
